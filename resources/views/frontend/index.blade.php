@@ -145,7 +145,7 @@
                     <label for="name" class="col-md-2 col-form-label">@lang('Tipe Market')</label>
 
                     <div class="col-md-10">
-                        <select name="tipe_market" class="form-control" >
+                        <select name="tipe_market" class="form-control">
                             <option value="">Pilih Tipe</option>
                             <option value="Alfamart">Alfamart</option>
                             <option value="Indomart">Indomart</option>
@@ -158,7 +158,7 @@
                 <div class="form-group row">
                     <label for="kecamatan" class="col-md-2 col-form-label">@lang('Kecamatan')</label>
                     <div class="col-md-10">
-                        <select name="id_kecamatan" class="form-control" >
+                        <select name="id_kecamatan" class="form-control">
                             <option value="">Pilih Kecamatan</option>
                             <?php foreach ($kecamatan as $kc) : ?>
                                 <option value="{{$kc->id}}">{{$kc->name}}</option>
@@ -166,7 +166,7 @@
                         </select>
                     </div>
                 </div>
-                 <button class="btn btn-sm btn-primary float-right" type="submit">Filter</button>
+                <button class="btn btn-sm btn-primary float-right" type="submit">Filter</button>
             </form>
             <div class="dropdown mt-3">
                 <!-- <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown">
@@ -231,7 +231,6 @@
     <script>
         var map;
         let market = {!!json_encode($market) !!};
-        console.log(market);
         let dataShow = null;
         var myOffcanvas = document.getElementById('dataShow')
         var bsOffcanvas = new bootstrap.Offcanvas(myOffcanvas)
@@ -249,14 +248,67 @@
                 center: [-7.2162311, 107.8992377],
                 zoom: 18
             });
-            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
+             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+	attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+}).addTo(map);
 
 
             let coords = market.map(e => [parseFloat(e.longitude), parseFloat(e.latitude)]);
             market.map(e => {
-                L.marker([parseFloat(e.longitude), parseFloat(e.latitude)]).addTo(map).on('click', function() {
+                let longitude = e.longitude;
+                let latitude = e.latitude
+                if (!((longitude).toString().indexOf("-") > -1)) {
+                    longitude = "-" + longitude;
+                    console.log(longitude);
+                }
+
+                let iconOptions;
+
+                switch (e.tipe_market) {
+                    case "Alfamart":
+                        iconOptions = {
+                            iconUrl: 'http://localhost:8000/img/alfamart.png',
+                            iconSize: [50, 50]
+                        };
+                        break;
+                    case "Indomaret":
+                        iconOptions = {
+                            iconUrl: 'http://localhost:8000/img/indomaret.png',
+                            iconSize: [50, 50]
+                        };
+                        break;
+                    case "Yomart":
+                        iconOptions = {
+                            iconUrl: 'http://localhost:8000/img/yomart.png',
+                            iconSize: [50, 50]
+                        };
+                        break;
+                    case "Alfamidi":
+                        iconOptions = {
+                            iconUrl: 'http://localhost:8000/img/alfamidi.png',
+                            iconSize: [50, 50]
+                        };
+                        break;
+                    case "Lainnya":
+                        iconOptions = {
+                            iconUrl: 'http://localhost:8000/img/lainnya.png',
+                            iconSize: [50, 50]
+                        };
+                        break;
+                    case "Indomart":
+                        iconOptions = {
+                            iconUrl: 'http://localhost:8000/img/indomaret.png',
+                            iconSize: [50, 50]
+                        };
+                        break;
+                }
+
+                console.log(e);
+                // Creating a custom icon
+                var customIcon = L.icon(iconOptions);
+                L.marker([parseFloat(longitude), parseFloat(latitude)], {
+                    icon: customIcon
+                }).addTo(map).on('click', function() {
                     console.log(e);
                     listGambar.innerHTML = ''
                     let gambar = e.gambar;
@@ -290,9 +342,9 @@
                 });
             });
             console.log(coords);
-            map.fitBounds(coords, {
-                padding: [40, 40]
-            });
+            // map.fitBounds(coords, {
+            //     padding: [40, 40]
+            // });
 
             // setTimeout(() => {
             //     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
