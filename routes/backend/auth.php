@@ -197,6 +197,7 @@ Route::group([
             });
 
         Route::post('/', [MarketController::class, 'store'])->name('store');
+        Route::get('/map/{market}', [MarketController::class, 'map'])->name('map');
 
         Route::group(['prefix' => '{market}'], function () {
             Route::get('edit', [MarketController::class, 'edit'])

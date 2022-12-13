@@ -25,8 +25,10 @@ class HomeController
             $market->where('id_kecamatan', $request->get('id_kecamatan'));
         }
 
+        $id_kecamatan = $request->get('id_kecamatan');
+
         $market = $market->get();
         $kecamatan = Kecamatan::all();
-        return view('frontend.index', compact('market', 'kecamatan'));
+        return view('frontend.index', compact('market', 'kecamatan', 'id_kecamatan'));
     }
 }

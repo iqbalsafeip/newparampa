@@ -74,12 +74,12 @@ class MarketController
 
 
         if ($market->save()) {
-            $index= 0;
+            $index = 0;
             foreach ($request->gambar as $file) {
                 $image = new ImageMarket();
                 $image->id_market = $market->id;
                 $ext = $file->getClientOriginalExtension();
-                $imageName = time() .'.ID-'.$index. '.' . $file->getClientOriginalExtension();
+                $imageName = time() . '.ID-' . $index . '.' . $file->getClientOriginalExtension();
                 $file->move(public_path('gambar'), $imageName);
                 $image->doc = $imageName;
                 $image->save();
@@ -100,6 +100,11 @@ class MarketController
         return view('backend.auth.market.edit', compact('market', 'kecamatan'));
     }
 
+    public function map(DataMarket $market)
+    {
+        return view('backend.auth.market.map', compact('market'));
+    }
+
     /**
      * @param  UpdateRoleRequest  $request
      * @param  Role  $role
@@ -114,19 +119,26 @@ class MarketController
         $data = $request->all();
         foreach ($data as $d => $f) {
             if (in_array($d, ['nama_permohonan', 'nama_perusahaan', 'alamat', 'nomor_izin', 'tanggal_izin', 'tipe_market', 'id_kecamatan', 'longitude', 'latitude'])) {
-                $market->$d = $f;
+                if ($f) {
+                    $market->$d = $f;
+                }
             }
         }
 
-        foreach ($request->gambar as $file) {
-            $image = new ImageMarket();
-            $image->id_market = $market->id;
-            $ext = $file->getClientOriginalExtension();
-            $imageName = time() . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('gambar'), $imageName);
 
-            $image->doc = $imageName;
-            $image->save();
+        $index = 0;
+        if ($request->gambar) {
+
+            foreach ($request->gambar as $file) {
+                $image = new ImageMarket();
+                $image->id_market = $market->id;
+                $ext = $file->getClientOriginalExtension();
+                $imageName = time() . '.ID-' . $index . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('gambar'), $imageName);
+                $image->doc = $imageName;
+                $image->save();
+                $index++;
+            }
         }
         $market->update();
         return redirect()->route('admin.auth.market.index')->withFlashSuccess(__('Market was successfully updated.'));
